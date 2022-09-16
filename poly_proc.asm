@@ -3844,7 +3844,7 @@ irq1PolygonFunction:
 ;vsync flag check
 		lda	<vsyncFlag
 		cmp	#$C0
-		jne	.vsyncProcEnd
+		bne	.vsyncProcEnd
 
 .vsyncProc:
 		lda	<selectVdc
@@ -4381,7 +4381,7 @@ setCgToSgData:
 		iny
 		iny
 		cpy	#33
-		jeq	.funcEnd
+		beq	.funcEnd
 
 		cpy	#16
 		bne	.jp08
@@ -4679,12 +4679,12 @@ calcEdge_putPoly:
 		sta	<edgeY0
 
 		cmp	<minEdgeY
-		jcs	.calcEdge_putPolyJump2
+		bcs	.calcEdge_putPolyJump2
 		sta	<minEdgeY
 
 .calcEdge_putPolyJump2:
 		cmp	<maxEdgeY
-		jcc	.calcEdge_putPolyJump6
+		bcc	.calcEdge_putPolyJump6
 		sta	<maxEdgeY
 
 .calcEdge_putPolyJump6:
@@ -4734,7 +4734,7 @@ calcCircle_putPoly:
 .jp10:
 		lda	<minEdgeY
 		cmp	#192
-		jcc	.jp11
+		bcc	.jp11
 		rts
 
 .jp11:
@@ -4907,13 +4907,13 @@ setCircleEdge0:
 		bcs	.endSet
 
 		cpy	<minEdgeY
-		jcs	.jp02
+		bcs	.jp02
 
 		sty	<minEdgeY
 
 .jp02:
 		cpy	<maxEdgeY
-		jcc	.jp03
+		bcc	.jp03
 
 		sty	<maxEdgeY
 
@@ -4939,13 +4939,13 @@ setCircleEdge1:
 		bcs	.endSet
 
 		cpy	<minEdgeY
-		jcs	.jp02
+		bcs	.jp02
 
 		sty	<minEdgeY
 
 .jp02:
 		cpy	<maxEdgeY
-		jcc	.jp03
+		bcc	.jp03
 
 		sty	<maxEdgeY
 
@@ -4975,7 +4975,7 @@ calcEdge:
 		beq	.edgeJump6L
 
 		sta	<edgeSlopeY
-		jcs	.edgeJump7L
+		bcs	.edgeJump7L
 
 		eor	#$FF
 		inc	a
@@ -5047,7 +5047,7 @@ calcEdge:
 ;edgeSlope compare
 		lda	<edgeSlopeY
 		cmp	<edgeSlopeX
-		jcs	.edgeJump4L
+		bcs	.edgeJump4L
 
 ;edgeSlopeX > edgeSlopeY
 ;check edgeSigneX
@@ -5241,7 +5241,7 @@ calcEdge:
 		beq	.edgeJump6R
 
 		sta	<edgeSlopeY
-		jcs	.edgeJump7R
+		bcs	.edgeJump7R
 
 		eor	#$FF
 		inc	a
@@ -5313,7 +5313,7 @@ calcEdge:
 ;edgeSlope compare
 		lda	<edgeSlopeY
 		cmp	<edgeSlopeX
-		jcs	.edgeJump4R
+		bcs	.edgeJump4R
 
 ;check edgeSigneX
 		bbs7	<edgeSigneX, .edgeJump10R
@@ -5548,16 +5548,18 @@ putPolyLineProc:
 		cmp	edgeRight, y
 		bcc	.jp0
 
+;swap left and right
 		tax
 		lda	edgeRight, y
 		sta	edgeLeft, y
 		tax
 		sta	edgeRight, y
 
+		lda	edgeLeft, y
+
 ;calation vram address
 ;left
 ;calation counts
-		lda	edgeLeft, y
 .jp0:
 		lsr	a
 		lsr	a
