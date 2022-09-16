@@ -3872,7 +3872,7 @@ irq1PolygonFunction:
 ;VDC2 VRAM_VRAM DMA
 		st012	#$10, #$5000		;set DMA src
 		st012	#$11, #$2000		;set DMA dest
-		st012	#$12, #$3000		;set DMA count
+		st012	#$12, #$3000-1		;set DMA count
 
 ;change selectVdc
 		mov 	<selectVdc, #VDC2
@@ -3901,7 +3901,7 @@ irq1PolygonFunction:
 ;VDC1 VRAM_VRAM DMA
 		st012	#$10, #$5000		;set DMA src
 		st012	#$11, #$2000		;set DMA dest
-		st012	#$12, #$3000		;set DMA count
+		st012	#$12, #$3000-1		;set DMA count
 
 ;change selectVdc
 		mov	<selectVdc, #VDC1
