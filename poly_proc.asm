@@ -1895,6 +1895,7 @@ putPolygonBuffer:
 .polygonProc:
 		and	#$0F
 		sta	<clip2D0Count
+
 		pha
 
 ;check Y coordinate
@@ -1922,8 +1923,8 @@ putPolygonBuffer:
 		cmp	<yCheckWork
 		beq	.jp01
 		smb7	<yCheckFlag
-.jp01:
 
+.jp01:
 		dec	<clip2D0Count
 		bne	.putPolyBufferLoop1
 
@@ -5680,9 +5681,6 @@ putPolyLineProc:
 ;VDC1 right 0 1
 		lda	<polyLineRightAddr
 		ldy	<polyLineRightAddr+1
-		st0	#$00
-		sta	VDC1_2
-		sty	VDC1_3
 
 		st0	#$01
 		sta	VDC1_2
@@ -5751,9 +5749,6 @@ putPolyLineProc:
 		lda	<polyLineRightAddr
 		ora	#$08
 		ldy	<polyLineRightAddr+1
-		st0	#$00
-		sta	VDC1_2
-		sty	VDC1_3
 
 		st0	#$01
 		sta	VDC1_2
@@ -5833,9 +5828,6 @@ putPolyLineProc:
 ;VDC2 right 0 1
 		lda	<polyLineRightAddr
 		ldy	<polyLineRightAddr+1
-		st0	#$00
-		sta	VDC2_2
-		sty	VDC2_3
 
 		st0	#$01
 		sta	VDC2_2
@@ -5904,9 +5896,6 @@ putPolyLineProc:
 		lda	<polyLineRightAddr
 		ora	#$08
 		ldy	<polyLineRightAddr+1
-		st0	#$00
-		sta	VDC2_2
-		sty	VDC2_3
 
 		st0	#$01
 		sta	VDC2_2
@@ -6090,159 +6079,159 @@ putPolyLineProc:
 
 ;--------
 .centerVDC1_01Addr:
-			dw	.centerVDC1_01 +6*30	;-1
-			dw	.centerVDC1_01 +6*30	;0
+		dw	.centerVDC1_01 +6*30	;-1
+		dw	.centerVDC1_01 +6*30	;0
 
-			dw	.centerVDC1_01 +6*29	;1
-			dw	.centerVDC1_01 +6*28	;2
-			dw	.centerVDC1_01 +6*27	;3
-			dw	.centerVDC1_01 +6*26	;4
-			dw	.centerVDC1_01 +6*25	;5
-			dw	.centerVDC1_01 +6*24	;6
-			dw	.centerVDC1_01 +6*23	;7
-			dw	.centerVDC1_01 +6*22	;8
-			dw	.centerVDC1_01 +6*21	;9
+		dw	.centerVDC1_01 +6*29	;1
+		dw	.centerVDC1_01 +6*28	;2
+		dw	.centerVDC1_01 +6*27	;3
+		dw	.centerVDC1_01 +6*26	;4
+		dw	.centerVDC1_01 +6*25	;5
+		dw	.centerVDC1_01 +6*24	;6
+		dw	.centerVDC1_01 +6*23	;7
+		dw	.centerVDC1_01 +6*22	;8
+		dw	.centerVDC1_01 +6*21	;9
 
-			dw	.centerVDC1_01 +6*20	;10
-			dw	.centerVDC1_01 +6*19	;11
-			dw	.centerVDC1_01 +6*18	;12
-			dw	.centerVDC1_01 +6*17	;13
-			dw	.centerVDC1_01 +6*16	;14
-			dw	.centerVDC1_01 +6*15	;15
-			dw	.centerVDC1_01 +6*14	;16
-			dw	.centerVDC1_01 +6*13	;17
-			dw	.centerVDC1_01 +6*12	;18
-			dw	.centerVDC1_01 +6*11	;19
+		dw	.centerVDC1_01 +6*20	;10
+		dw	.centerVDC1_01 +6*19	;11
+		dw	.centerVDC1_01 +6*18	;12
+		dw	.centerVDC1_01 +6*17	;13
+		dw	.centerVDC1_01 +6*16	;14
+		dw	.centerVDC1_01 +6*15	;15
+		dw	.centerVDC1_01 +6*14	;16
+		dw	.centerVDC1_01 +6*13	;17
+		dw	.centerVDC1_01 +6*12	;18
+		dw	.centerVDC1_01 +6*11	;19
 
-			dw	.centerVDC1_01 +6*10	;20
-			dw	.centerVDC1_01 +6*9	;21
-			dw	.centerVDC1_01 +6*8	;22
-			dw	.centerVDC1_01 +6*7	;23
-			dw	.centerVDC1_01 +6*6	;24
-			dw	.centerVDC1_01 +6*5	;25
-			dw	.centerVDC1_01 +6*4	;26
-			dw	.centerVDC1_01 +6*3	;27
-			dw	.centerVDC1_01 +6*2	;28
-			dw	.centerVDC1_01 +6*1	;29
+		dw	.centerVDC1_01 +6*10	;20
+		dw	.centerVDC1_01 +6*9	;21
+		dw	.centerVDC1_01 +6*8	;22
+		dw	.centerVDC1_01 +6*7	;23
+		dw	.centerVDC1_01 +6*6	;24
+		dw	.centerVDC1_01 +6*5	;25
+		dw	.centerVDC1_01 +6*4	;26
+		dw	.centerVDC1_01 +6*3	;27
+		dw	.centerVDC1_01 +6*2	;28
+		dw	.centerVDC1_01 +6*1	;29
 
-			dw	.centerVDC1_01 +6*0	;30
+		dw	.centerVDC1_01 +6*0	;30
 
 ;--------
 .centerVDC1_02Addr:
-			dw	.centerVDC1_02 +6*30	;-1
-			dw	.centerVDC1_02 +6*30	;0
+		dw	.centerVDC1_02 +6*30	;-1
+		dw	.centerVDC1_02 +6*30	;0
 
-			dw	.centerVDC1_02 +6*29	;1
-			dw	.centerVDC1_02 +6*28	;2
-			dw	.centerVDC1_02 +6*27	;3
-			dw	.centerVDC1_02 +6*26	;4
-			dw	.centerVDC1_02 +6*25	;5
-			dw	.centerVDC1_02 +6*24	;6
-			dw	.centerVDC1_02 +6*23	;7
-			dw	.centerVDC1_02 +6*22	;8
-			dw	.centerVDC1_02 +6*21	;9
+		dw	.centerVDC1_02 +6*29	;1
+		dw	.centerVDC1_02 +6*28	;2
+		dw	.centerVDC1_02 +6*27	;3
+		dw	.centerVDC1_02 +6*26	;4
+		dw	.centerVDC1_02 +6*25	;5
+		dw	.centerVDC1_02 +6*24	;6
+		dw	.centerVDC1_02 +6*23	;7
+		dw	.centerVDC1_02 +6*22	;8
+		dw	.centerVDC1_02 +6*21	;9
 
-			dw	.centerVDC1_02 +6*20	;10
-			dw	.centerVDC1_02 +6*19	;11
-			dw	.centerVDC1_02 +6*18	;12
-			dw	.centerVDC1_02 +6*17	;13
-			dw	.centerVDC1_02 +6*16	;14
-			dw	.centerVDC1_02 +6*15	;15
-			dw	.centerVDC1_02 +6*14	;16
-			dw	.centerVDC1_02 +6*13	;17
-			dw	.centerVDC1_02 +6*12	;18
-			dw	.centerVDC1_02 +6*11	;19
+		dw	.centerVDC1_02 +6*20	;10
+		dw	.centerVDC1_02 +6*19	;11
+		dw	.centerVDC1_02 +6*18	;12
+		dw	.centerVDC1_02 +6*17	;13
+		dw	.centerVDC1_02 +6*16	;14
+		dw	.centerVDC1_02 +6*15	;15
+		dw	.centerVDC1_02 +6*14	;16
+		dw	.centerVDC1_02 +6*13	;17
+		dw	.centerVDC1_02 +6*12	;18
+		dw	.centerVDC1_02 +6*11	;19
 
-			dw	.centerVDC1_02 +6*10	;20
-			dw	.centerVDC1_02 +6*9	;21
-			dw	.centerVDC1_02 +6*8	;22
-			dw	.centerVDC1_02 +6*7	;23
-			dw	.centerVDC1_02 +6*6	;24
-			dw	.centerVDC1_02 +6*5	;25
-			dw	.centerVDC1_02 +6*4	;26
-			dw	.centerVDC1_02 +6*3	;27
-			dw	.centerVDC1_02 +6*2	;28
-			dw	.centerVDC1_02 +6*1	;29
+		dw	.centerVDC1_02 +6*10	;20
+		dw	.centerVDC1_02 +6*9	;21
+		dw	.centerVDC1_02 +6*8	;22
+		dw	.centerVDC1_02 +6*7	;23
+		dw	.centerVDC1_02 +6*6	;24
+		dw	.centerVDC1_02 +6*5	;25
+		dw	.centerVDC1_02 +6*4	;26
+		dw	.centerVDC1_02 +6*3	;27
+		dw	.centerVDC1_02 +6*2	;28
+		dw	.centerVDC1_02 +6*1	;29
 
-			dw	.centerVDC1_02 +6*0	;30
+		dw	.centerVDC1_02 +6*0	;30
 
 ;--------
 .centerVDC2_01Addr:
-			dw	.centerVDC2_01 +6*30	;-1
-			dw	.centerVDC2_01 +6*30	;0
+		dw	.centerVDC2_01 +6*30	;-1
+		dw	.centerVDC2_01 +6*30	;0
 
-			dw	.centerVDC2_01 +6*29	;1
-			dw	.centerVDC2_01 +6*28	;2
-			dw	.centerVDC2_01 +6*27	;3
-			dw	.centerVDC2_01 +6*26	;4
-			dw	.centerVDC2_01 +6*25	;5
-			dw	.centerVDC2_01 +6*24	;6
-			dw	.centerVDC2_01 +6*23	;7
-			dw	.centerVDC2_01 +6*22	;8
-			dw	.centerVDC2_01 +6*21	;9
+		dw	.centerVDC2_01 +6*29	;1
+		dw	.centerVDC2_01 +6*28	;2
+		dw	.centerVDC2_01 +6*27	;3
+		dw	.centerVDC2_01 +6*26	;4
+		dw	.centerVDC2_01 +6*25	;5
+		dw	.centerVDC2_01 +6*24	;6
+		dw	.centerVDC2_01 +6*23	;7
+		dw	.centerVDC2_01 +6*22	;8
+		dw	.centerVDC2_01 +6*21	;9
 
-			dw	.centerVDC2_01 +6*20	;10
-			dw	.centerVDC2_01 +6*19	;11
-			dw	.centerVDC2_01 +6*18	;12
-			dw	.centerVDC2_01 +6*17	;13
-			dw	.centerVDC2_01 +6*16	;14
-			dw	.centerVDC2_01 +6*15	;15
-			dw	.centerVDC2_01 +6*14	;16
-			dw	.centerVDC2_01 +6*13	;17
-			dw	.centerVDC2_01 +6*12	;18
-			dw	.centerVDC2_01 +6*11	;19
+		dw	.centerVDC2_01 +6*20	;10
+		dw	.centerVDC2_01 +6*19	;11
+		dw	.centerVDC2_01 +6*18	;12
+		dw	.centerVDC2_01 +6*17	;13
+		dw	.centerVDC2_01 +6*16	;14
+		dw	.centerVDC2_01 +6*15	;15
+		dw	.centerVDC2_01 +6*14	;16
+		dw	.centerVDC2_01 +6*13	;17
+		dw	.centerVDC2_01 +6*12	;18
+		dw	.centerVDC2_01 +6*11	;19
 
-			dw	.centerVDC2_01 +6*10	;20
-			dw	.centerVDC2_01 +6*9	;21
-			dw	.centerVDC2_01 +6*8	;22
-			dw	.centerVDC2_01 +6*7	;23
-			dw	.centerVDC2_01 +6*6	;24
-			dw	.centerVDC2_01 +6*5	;25
-			dw	.centerVDC2_01 +6*4	;26
-			dw	.centerVDC2_01 +6*3	;27
-			dw	.centerVDC2_01 +6*2	;28
-			dw	.centerVDC2_01 +6*1	;29
+		dw	.centerVDC2_01 +6*10	;20
+		dw	.centerVDC2_01 +6*9	;21
+		dw	.centerVDC2_01 +6*8	;22
+		dw	.centerVDC2_01 +6*7	;23
+		dw	.centerVDC2_01 +6*6	;24
+		dw	.centerVDC2_01 +6*5	;25
+		dw	.centerVDC2_01 +6*4	;26
+		dw	.centerVDC2_01 +6*3	;27
+		dw	.centerVDC2_01 +6*2	;28
+		dw	.centerVDC2_01 +6*1	;29
 
-			dw	.centerVDC2_01 +6*0	;30
+		dw	.centerVDC2_01 +6*0	;30
 
 ;--------
 .centerVDC2_02Addr:
-			dw	.centerVDC2_02 +6*30	;-1
-			dw	.centerVDC2_02 +6*30	;0
+		dw	.centerVDC2_02 +6*30	;-1
+		dw	.centerVDC2_02 +6*30	;0
 
-			dw	.centerVDC2_02 +6*29	;1
-			dw	.centerVDC2_02 +6*28	;2
-			dw	.centerVDC2_02 +6*27	;3
-			dw	.centerVDC2_02 +6*26	;4
-			dw	.centerVDC2_02 +6*25	;5
-			dw	.centerVDC2_02 +6*24	;6
-			dw	.centerVDC2_02 +6*23	;7
-			dw	.centerVDC2_02 +6*22	;8
-			dw	.centerVDC2_02 +6*21	;9
+		dw	.centerVDC2_02 +6*29	;1
+		dw	.centerVDC2_02 +6*28	;2
+		dw	.centerVDC2_02 +6*27	;3
+		dw	.centerVDC2_02 +6*26	;4
+		dw	.centerVDC2_02 +6*25	;5
+		dw	.centerVDC2_02 +6*24	;6
+		dw	.centerVDC2_02 +6*23	;7
+		dw	.centerVDC2_02 +6*22	;8
+		dw	.centerVDC2_02 +6*21	;9
 
-			dw	.centerVDC2_02 +6*20	;10
-			dw	.centerVDC2_02 +6*19	;11
-			dw	.centerVDC2_02 +6*18	;12
-			dw	.centerVDC2_02 +6*17	;13
-			dw	.centerVDC2_02 +6*16	;14
-			dw	.centerVDC2_02 +6*15	;15
-			dw	.centerVDC2_02 +6*14	;16
-			dw	.centerVDC2_02 +6*13	;17
-			dw	.centerVDC2_02 +6*12	;18
-			dw	.centerVDC2_02 +6*11	;19
+		dw	.centerVDC2_02 +6*20	;10
+		dw	.centerVDC2_02 +6*19	;11
+		dw	.centerVDC2_02 +6*18	;12
+		dw	.centerVDC2_02 +6*17	;13
+		dw	.centerVDC2_02 +6*16	;14
+		dw	.centerVDC2_02 +6*15	;15
+		dw	.centerVDC2_02 +6*14	;16
+		dw	.centerVDC2_02 +6*13	;17
+		dw	.centerVDC2_02 +6*12	;18
+		dw	.centerVDC2_02 +6*11	;19
 
-			dw	.centerVDC2_02 +6*10	;20
-			dw	.centerVDC2_02 +6*9	;21
-			dw	.centerVDC2_02 +6*8	;22
-			dw	.centerVDC2_02 +6*7	;23
-			dw	.centerVDC2_02 +6*6	;24
-			dw	.centerVDC2_02 +6*5	;25
-			dw	.centerVDC2_02 +6*4	;26
-			dw	.centerVDC2_02 +6*3	;27
-			dw	.centerVDC2_02 +6*2	;28
-			dw	.centerVDC2_02 +6*1	;29
+		dw	.centerVDC2_02 +6*10	;20
+		dw	.centerVDC2_02 +6*9	;21
+		dw	.centerVDC2_02 +6*8	;22
+		dw	.centerVDC2_02 +6*7	;23
+		dw	.centerVDC2_02 +6*6	;24
+		dw	.centerVDC2_02 +6*5	;25
+		dw	.centerVDC2_02 +6*4	;26
+		dw	.centerVDC2_02 +6*3	;27
+		dw	.centerVDC2_02 +6*2	;28
+		dw	.centerVDC2_02 +6*1	;29
 
-			dw	.centerVDC2_02 +6*0	;30
+		dw	.centerVDC2_02 +6*0	;30
 
 
 ;----------------------------
