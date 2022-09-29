@@ -5539,7 +5539,8 @@ putPolyLineProc:
 		iny
 		iny
 
-.loopStart:	cpy	<maxEdgeY
+.loopStart:
+		cpy	<maxEdgeY
 		bcc	.putPolyProc
 		beq	.putPolyProc
 		rts
@@ -5553,10 +5554,9 @@ putPolyLineProc:
 		tax
 		lda	edgeRight, y
 		sta	edgeLeft, y
-		tax
+		sax
 		sta	edgeRight, y
-
-		lda	edgeLeft, y
+		sax
 
 ;calation vram address
 ;left
