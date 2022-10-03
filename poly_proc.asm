@@ -5511,9 +5511,19 @@ putPolyLine:
 		inc	a
 		and	#$FE
 		tay
-		jsr	putPolyLineProc
 
-		bbs6	<polyAttribute, .functionEnd	;skip line
+		lda	<selectVdc
+		cmp	#VDC2
+		beq	.jp0
+
+		jsr	putPolyLineProcVdc1
+		bra	.jp1
+
+.jp0:
+		jsr	putPolyLineProcVdc2
+
+.jp1:
+		bbs6	<polyAttribute, .jp3
 
 		mov	<polyLineColorDataWork0, polyLineColorWork_L_P0
 		mov	<polyLineColorDataWork1, polyLineColorWork_L_P1
@@ -5524,14 +5534,23 @@ putPolyLine:
 		and	#$FE
 		inc	a
 		tay
-		jsr	putPolyLineProc
 
-.functionEnd:
+		lda	<selectVdc
+		cmp	#VDC2
+		beq	.jp2
+
+		jsr	putPolyLineProcVdc1
+		bra	.jp3
+
+.jp2:
+		jsr	putPolyLineProcVdc2
+
+.jp3:
 		rts
 
 
 ;----------------------------
-putPolyLineProc:
+putPolyLineProcVdc1:
 ;put poly line
 		bra	.loopStart
 ;loop
@@ -5626,12 +5645,7 @@ putPolyLineProc:
 		sta	<polyLineRightMask
 
 ;put line
-		lda	<selectVdc
-		cmp	#VDC2
-		jeq	.vdc2Jp
-
 ;VDC1
-.vdc1Jp:
 ;center jump index
 		lda	<polyLineCount
 		asl	a
@@ -5779,8 +5793,260 @@ putPolyLineProc:
 ;loop jump
 		jmp	.loop0
 
+;put line same address
+.polyLineJump03:
+		lda	edgeRight, y
+		and	#$07
+		tax
+		lda	polyLineRightDatas, x
+		and	<polyLineLeftData
+		sta	<polyLineLeftData
+		eor	#$FF
+		sta	<polyLineLeftMask
+
+;VDC1
+;VDC1 left 0 1
+		lda	<polyLineLeftAddr
+		ldx	<polyLineLeftAddr+1
+		st0	#$00
+		sta	VDC1_2
+		stx	VDC1_3
+
+		st0	#$01
+		sta	VDC1_2
+		stx	VDC1_3
+
+		st0	#$02
+
+		lda	VDC1_2
+		and	<polyLineLeftMask
+		sta	<polyLineDataLow
+
+		lda	VDC1_3
+		and	<polyLineLeftMask
+		sta	<polyLineDataHigh
+
+		lda	<polyLineColorDataWork0
+		and	<polyLineLeftData
+		ora	<polyLineDataLow
+		sta	VDC1_2
+
+		lda	<polyLineColorDataWork1
+		and	<polyLineLeftData
+		ora	<polyLineDataHigh
+		sta	VDC1_3
+
+;VDC1 left 2 3
+		lda	<polyLineLeftAddr
+		ora	#$08
+		ldx	<polyLineLeftAddr+1
+		st0	#$00
+		sta	VDC1_2
+		stx	VDC1_3
+
+		st0	#$01
+		sta	VDC1_2
+		stx	VDC1_3
+
+		st0	#$02
+
+		lda	VDC1_2
+		and	<polyLineLeftMask
+		sta	<polyLineDataLow
+
+		lda	VDC1_3
+		and	<polyLineLeftMask
+		sta	<polyLineDataHigh
+
+		lda	<polyLineColorDataWork2
+		and	<polyLineLeftData
+		ora	<polyLineDataLow
+		sta	VDC1_2
+
+		lda	<polyLineColorDataWork3
+		and	<polyLineLeftData
+		ora	<polyLineDataHigh
+		sta	VDC1_3
+
+;loop jump
+		jmp	.loop0
+
+;--------
+.centerVDC1_01Addr:
+		dw	.centerVDC1_01 +6*30	;-1
+		dw	.centerVDC1_01 +6*30	;0
+
+		dw	.centerVDC1_01 +6*29	;1
+		dw	.centerVDC1_01 +6*28	;2
+		dw	.centerVDC1_01 +6*27	;3
+		dw	.centerVDC1_01 +6*26	;4
+		dw	.centerVDC1_01 +6*25	;5
+		dw	.centerVDC1_01 +6*24	;6
+		dw	.centerVDC1_01 +6*23	;7
+		dw	.centerVDC1_01 +6*22	;8
+		dw	.centerVDC1_01 +6*21	;9
+
+		dw	.centerVDC1_01 +6*20	;10
+		dw	.centerVDC1_01 +6*19	;11
+		dw	.centerVDC1_01 +6*18	;12
+		dw	.centerVDC1_01 +6*17	;13
+		dw	.centerVDC1_01 +6*16	;14
+		dw	.centerVDC1_01 +6*15	;15
+		dw	.centerVDC1_01 +6*14	;16
+		dw	.centerVDC1_01 +6*13	;17
+		dw	.centerVDC1_01 +6*12	;18
+		dw	.centerVDC1_01 +6*11	;19
+
+		dw	.centerVDC1_01 +6*10	;20
+		dw	.centerVDC1_01 +6*9	;21
+		dw	.centerVDC1_01 +6*8	;22
+		dw	.centerVDC1_01 +6*7	;23
+		dw	.centerVDC1_01 +6*6	;24
+		dw	.centerVDC1_01 +6*5	;25
+		dw	.centerVDC1_01 +6*4	;26
+		dw	.centerVDC1_01 +6*3	;27
+		dw	.centerVDC1_01 +6*2	;28
+		dw	.centerVDC1_01 +6*1	;29
+
+		dw	.centerVDC1_01 +6*0	;30
+
+;--------
+.centerVDC1_02Addr:
+		dw	.centerVDC1_02 +6*30	;-1
+		dw	.centerVDC1_02 +6*30	;0
+
+		dw	.centerVDC1_02 +6*29	;1
+		dw	.centerVDC1_02 +6*28	;2
+		dw	.centerVDC1_02 +6*27	;3
+		dw	.centerVDC1_02 +6*26	;4
+		dw	.centerVDC1_02 +6*25	;5
+		dw	.centerVDC1_02 +6*24	;6
+		dw	.centerVDC1_02 +6*23	;7
+		dw	.centerVDC1_02 +6*22	;8
+		dw	.centerVDC1_02 +6*21	;9
+
+		dw	.centerVDC1_02 +6*20	;10
+		dw	.centerVDC1_02 +6*19	;11
+		dw	.centerVDC1_02 +6*18	;12
+		dw	.centerVDC1_02 +6*17	;13
+		dw	.centerVDC1_02 +6*16	;14
+		dw	.centerVDC1_02 +6*15	;15
+		dw	.centerVDC1_02 +6*14	;16
+		dw	.centerVDC1_02 +6*13	;17
+		dw	.centerVDC1_02 +6*12	;18
+		dw	.centerVDC1_02 +6*11	;19
+
+		dw	.centerVDC1_02 +6*10	;20
+		dw	.centerVDC1_02 +6*9	;21
+		dw	.centerVDC1_02 +6*8	;22
+		dw	.centerVDC1_02 +6*7	;23
+		dw	.centerVDC1_02 +6*6	;24
+		dw	.centerVDC1_02 +6*5	;25
+		dw	.centerVDC1_02 +6*4	;26
+		dw	.centerVDC1_02 +6*3	;27
+		dw	.centerVDC1_02 +6*2	;28
+		dw	.centerVDC1_02 +6*1	;29
+
+		dw	.centerVDC1_02 +6*0	;30
+
+
+;----------------------------
+putPolyLineProcVdc2:
+;put poly line
+		bra	.loopStart
+;loop
+.loop0:
+		iny
+		iny
+
+.loopStart:
+		cpy	<maxEdgeY
+		bcc	.putPolyProc
+		beq	.putPolyProc
+		rts
+
+.putPolyProc:
+		lda	edgeLeft, y
+		cmp	edgeRight, y
+		bcc	.jp0
+
+;swap left and right
+		tax
+		lda	edgeRight, y
+		sta	edgeLeft, y
+		sax
+		sta	edgeRight, y
+		sax
+
+;calation vram address
+;left
+;calation counts
+.jp0:
+		lsr	a
+		lsr	a
+		lsr	a
+		sta	<polyLineCount
+
+;left address
+		tax
+		lda	polyLineAddrConvXLow, x
+		ora	polyLineAddrConvYLow, y
+		sta	<polyLineLeftAddr
+
+		lda	polyLineAddrConvXHigh, x
+		ora	polyLineAddrConvYHigh, y
+		clc
+		adc	<polygonTopAddress
+		sta	<polyLineLeftAddr+1
+
+;left put data
+		lda	edgeLeft, y
+		and	#$07
+		tax
+
+		lda	polyLineLeftDatas, x
+		sta	<polyLineLeftData
+		eor	#$FF
+		sta	<polyLineLeftMask
+
+;right
+;calation counts
+		lda	edgeRight, y
+		lsr	a
+		lsr	a
+		lsr	a
+		tax
+		sec
+		sbc	<polyLineCount
+
+;count 0 then
+		jeq	.polyLineJump03
+
+		sta	<polyLineCount
+
+;right address
+		lda	polyLineAddrConvXLow, x
+		ora	polyLineAddrConvYLow, y
+		sta	<polyLineRightAddr
+
+		lda	polyLineAddrConvXHigh, x
+		ora	polyLineAddrConvYHigh, y
+		clc
+		adc	<polygonTopAddress
+		sta	<polyLineRightAddr+1
+
+;right put data
+		lda	edgeRight, y
+		and	#$07
+		tax
+
+		lda	polyLineRightDatas, x
+		sta	<polyLineRightData
+		eor	#$FF
+		sta	<polyLineRightMask
+
+;put line
 ;VDC2
-.vdc2Jp:
 		lda	<polyLineCount
 		asl	a
 		tax
@@ -5937,80 +6203,7 @@ putPolyLineProc:
 		eor	#$FF
 		sta	<polyLineLeftMask
 
-		lda	<selectVdc
-		cmp	#VDC2
-		beq	.vdc2Jp2
-
-;VDC1
-.vdc1Jp2:
-;VDC1 left 0 1
-		lda	<polyLineLeftAddr
-		ldx	<polyLineLeftAddr+1
-		st0	#$00
-		sta	VDC1_2
-		stx	VDC1_3
-
-		st0	#$01
-		sta	VDC1_2
-		stx	VDC1_3
-
-		st0	#$02
-
-		lda	VDC1_2
-		and	<polyLineLeftMask
-		sta	<polyLineDataLow
-
-		lda	VDC1_3
-		and	<polyLineLeftMask
-		sta	<polyLineDataHigh
-
-		lda	<polyLineColorDataWork0
-		and	<polyLineLeftData
-		ora	<polyLineDataLow
-		sta	VDC1_2
-
-		lda	<polyLineColorDataWork1
-		and	<polyLineLeftData
-		ora	<polyLineDataHigh
-		sta	VDC1_3
-
-;VDC1 left 2 3
-		lda	<polyLineLeftAddr
-		ora	#$08
-		ldx	<polyLineLeftAddr+1
-		st0	#$00
-		sta	VDC1_2
-		stx	VDC1_3
-
-		st0	#$01
-		sta	VDC1_2
-		stx	VDC1_3
-
-		st0	#$02
-
-		lda	VDC1_2
-		and	<polyLineLeftMask
-		sta	<polyLineDataLow
-
-		lda	VDC1_3
-		and	<polyLineLeftMask
-		sta	<polyLineDataHigh
-
-		lda	<polyLineColorDataWork2
-		and	<polyLineLeftData
-		ora	<polyLineDataLow
-		sta	VDC1_2
-
-		lda	<polyLineColorDataWork3
-		and	<polyLineLeftData
-		ora	<polyLineDataHigh
-		sta	VDC1_3
-
-;loop jump
-		jmp	.loop0
-
 ;VDC2
-.vdc2Jp2:
 ;VDC2 left 0 1
 		lda	<polyLineLeftAddr
 		ldx	<polyLineLeftAddr+1
@@ -6076,84 +6269,6 @@ putPolyLineProc:
 
 ;loop jump
 		jmp	.loop0
-
-;--------
-.centerVDC1_01Addr:
-		dw	.centerVDC1_01 +6*30	;-1
-		dw	.centerVDC1_01 +6*30	;0
-
-		dw	.centerVDC1_01 +6*29	;1
-		dw	.centerVDC1_01 +6*28	;2
-		dw	.centerVDC1_01 +6*27	;3
-		dw	.centerVDC1_01 +6*26	;4
-		dw	.centerVDC1_01 +6*25	;5
-		dw	.centerVDC1_01 +6*24	;6
-		dw	.centerVDC1_01 +6*23	;7
-		dw	.centerVDC1_01 +6*22	;8
-		dw	.centerVDC1_01 +6*21	;9
-
-		dw	.centerVDC1_01 +6*20	;10
-		dw	.centerVDC1_01 +6*19	;11
-		dw	.centerVDC1_01 +6*18	;12
-		dw	.centerVDC1_01 +6*17	;13
-		dw	.centerVDC1_01 +6*16	;14
-		dw	.centerVDC1_01 +6*15	;15
-		dw	.centerVDC1_01 +6*14	;16
-		dw	.centerVDC1_01 +6*13	;17
-		dw	.centerVDC1_01 +6*12	;18
-		dw	.centerVDC1_01 +6*11	;19
-
-		dw	.centerVDC1_01 +6*10	;20
-		dw	.centerVDC1_01 +6*9	;21
-		dw	.centerVDC1_01 +6*8	;22
-		dw	.centerVDC1_01 +6*7	;23
-		dw	.centerVDC1_01 +6*6	;24
-		dw	.centerVDC1_01 +6*5	;25
-		dw	.centerVDC1_01 +6*4	;26
-		dw	.centerVDC1_01 +6*3	;27
-		dw	.centerVDC1_01 +6*2	;28
-		dw	.centerVDC1_01 +6*1	;29
-
-		dw	.centerVDC1_01 +6*0	;30
-
-;--------
-.centerVDC1_02Addr:
-		dw	.centerVDC1_02 +6*30	;-1
-		dw	.centerVDC1_02 +6*30	;0
-
-		dw	.centerVDC1_02 +6*29	;1
-		dw	.centerVDC1_02 +6*28	;2
-		dw	.centerVDC1_02 +6*27	;3
-		dw	.centerVDC1_02 +6*26	;4
-		dw	.centerVDC1_02 +6*25	;5
-		dw	.centerVDC1_02 +6*24	;6
-		dw	.centerVDC1_02 +6*23	;7
-		dw	.centerVDC1_02 +6*22	;8
-		dw	.centerVDC1_02 +6*21	;9
-
-		dw	.centerVDC1_02 +6*20	;10
-		dw	.centerVDC1_02 +6*19	;11
-		dw	.centerVDC1_02 +6*18	;12
-		dw	.centerVDC1_02 +6*17	;13
-		dw	.centerVDC1_02 +6*16	;14
-		dw	.centerVDC1_02 +6*15	;15
-		dw	.centerVDC1_02 +6*14	;16
-		dw	.centerVDC1_02 +6*13	;17
-		dw	.centerVDC1_02 +6*12	;18
-		dw	.centerVDC1_02 +6*11	;19
-
-		dw	.centerVDC1_02 +6*10	;20
-		dw	.centerVDC1_02 +6*9	;21
-		dw	.centerVDC1_02 +6*8	;22
-		dw	.centerVDC1_02 +6*7	;23
-		dw	.centerVDC1_02 +6*6	;24
-		dw	.centerVDC1_02 +6*5	;25
-		dw	.centerVDC1_02 +6*4	;26
-		dw	.centerVDC1_02 +6*3	;27
-		dw	.centerVDC1_02 +6*2	;28
-		dw	.centerVDC1_02 +6*1	;29
-
-		dw	.centerVDC1_02 +6*0	;30
 
 ;--------
 .centerVDC2_01Addr:
@@ -6232,6 +6347,10 @@ putPolyLineProc:
 		dw	.centerVDC2_02 +6*1	;29
 
 		dw	.centerVDC2_02 +6*0	;30
+
+
+
+
 
 
 ;----------------------------
