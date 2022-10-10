@@ -5502,6 +5502,8 @@ calcEdge:
 ;----------------------------
 putPolyLine:
 ;put poly line
+		inc	<maxEdgeY
+
 		mov	<polyLineColorDataWork0, polyLineColorWork_H_P0
 		mov	<polyLineColorDataWork1, polyLineColorWork_H_P1
 		mov	<polyLineColorDataWork2, polyLineColorWork_H_P2
@@ -5553,6 +5555,21 @@ putPolyLine:
 putPolyLineProcVdc1:
 ;put poly line
 		bra	.loopStart
+
+.jpRts:
+		rts
+
+.jpSwap:
+;swap left and right
+		beq	.jp0
+		tax
+		lda	edgeRight, y
+		sta	edgeLeft, y
+		sax
+		sta	edgeRight, y
+		sax
+		bra	.jp0
+
 ;loop
 .loop0:
 		iny
@@ -5560,22 +5577,12 @@ putPolyLineProcVdc1:
 
 .loopStart:
 		cpy	<maxEdgeY
-		bcc	.putPolyProc
-		beq	.putPolyProc
-		rts
+		bcs	.jpRts
 
 .putPolyProc:
 		lda	edgeLeft, y
 		cmp	edgeRight, y
-		bcc	.jp0
-
-;swap left and right
-		tax
-		lda	edgeRight, y
-		sta	edgeLeft, y
-		sax
-		sta	edgeRight, y
-		sax
+		bcs	.jpSwap
 
 ;calation vram address
 ;left
@@ -5954,6 +5961,21 @@ putPolyLineProcVdc1:
 putPolyLineProcVdc2:
 ;put poly line
 		bra	.loopStart
+
+.jpRts:
+		rts
+
+.jpSwap:
+;swap left and right
+		beq	.jp0
+		tax
+		lda	edgeRight, y
+		sta	edgeLeft, y
+		sax
+		sta	edgeRight, y
+		sax
+		bra	.jp0
+
 ;loop
 .loop0:
 		iny
@@ -5961,22 +5983,12 @@ putPolyLineProcVdc2:
 
 .loopStart:
 		cpy	<maxEdgeY
-		bcc	.putPolyProc
-		beq	.putPolyProc
-		rts
+		bcs	.jpRts
 
 .putPolyProc:
 		lda	edgeLeft, y
 		cmp	edgeRight, y
-		bcc	.jp0
-
-;swap left and right
-		tax
-		lda	edgeRight, y
-		sta	edgeLeft, y
-		sax
-		sta	edgeRight, y
-		sax
+		bcs	.jpSwap
 
 ;calation vram address
 ;left
@@ -6349,10 +6361,6 @@ putPolyLineProcVdc2:
 		dw	.centerVDC2_02 +6*0	;30
 
 
-
-
-
-
 ;----------------------------
 polyLineAddrConvYHigh:
 		.db	$00, $00, $00, $00, $00, $00, $00, $00, $04, $04, $04, $04, $04, $04, $04, $04,\
@@ -6395,6 +6403,7 @@ polyLineAddrConvXHigh:
 polyLineAddrConvXLow:
 		.db	$00, $20, $40, $60, $80, $A0, $C0, $E0, $00, $20, $40, $60, $80, $A0, $C0, $E0,\
 			$00, $20, $40, $60, $80, $A0, $C0, $E0, $00, $20, $40, $60, $80, $A0, $C0, $E0
+
 
 ;----------------------------
 polyLineLeftDatas:
