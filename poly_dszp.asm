@@ -83,7 +83,7 @@ polyLineColorDataWork2	.ds	1
 polyLineColorDataWork3	.ds	1
 polyLineDataLow		.ds	1
 polyLineDataHigh	.ds	1
-;			total 23 Byte
+;			total 22 Byte
 
 ;---------------------
 			.org	shareAreaTop
