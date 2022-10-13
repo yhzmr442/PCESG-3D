@@ -1898,14 +1898,8 @@ putPolygonBuffer:
 
 		pha
 
-;check Y coordinate
-		stz	<yCheckFlag
-		ldy	#7
-		lda	[polyBufferAddr], y
-		sta	<yCheckWork
-
 		clx
-		dey
+		ldy	#6
 
 .putPolyBufferLoop1:
 		lda	[polyBufferAddr], y
@@ -1920,17 +1914,10 @@ putPolygonBuffer:
 		inx
 		iny
 
-		cmp	<yCheckWork
-		beq	.jp01
-		smb7	<yCheckFlag
-
-.jp01:
 		dec	<clip2D0Count
 		bne	.putPolyBufferLoop1
 
 		pla
-
-		bbr7	<yCheckFlag, .nextData
 
 		sta	<clip2D0Count
 		jsr	calcEdge_putPoly
@@ -4644,34 +4631,16 @@ calcEdge_putPoly:
 		lda	<clip2D0Count
 		asl	a
 		asl	a
-		sta	<calcEdgeLastAddr
 		tax
 		lda	clip2D0
 		sta	clip2D0, x
 		lda	clip2D0+2
 		sta	clip2D0+2, x
 
-		cly
-		ldx	#$04
-.minLoop:
-		lda	clip2D0+2, y
-		cmp	clip2D0+2, x
-		bcc	.minJp
-
-		txa
-		tay
-.minJp:
-		inx
-		inx
-		inx
-		inx
-		cpx	<calcEdgeLastAddr
-		bne	.minLoop
-
 		mov	<minEdgeY, #$FF
 		stz	<maxEdgeY
 
-		sxy
+		clx
 
 .calcEdge_putPolyLoop0:
 		lda	clip2D0, x
@@ -4704,13 +4673,7 @@ calcEdge_putPoly:
 		inx
 
 		dec	<clip2D0Count
-		beq	.loopEnd
-
-		cpx	<calcEdgeLastAddr
 		bne	.calcEdge_putPolyLoop0
-		clx
-		bra	.calcEdge_putPolyLoop0
-.loopEnd:
 
 		jsr	putPolyLine
 
@@ -4966,15 +4929,36 @@ calcEdge:
 ;
 		lda	<edgeY1
 		cmp	<edgeY0
-		jcc	.jp00
+		bne	.jp01
+
+;edgeY0=edgeY1
+		ldx	<edgeY0
+		lda	<edgeX0
+		cmp	<edgeX1
+		bne	.jp04
+
+;edgeX0=edgeX1
+		ldy	<clip2D0Count
+		cpy	#1
+		beq	.jp05
+
+;edgeX0!=edgeX1
+.jp04:
+		sta	edgeLeft, x
+		lda	<edgeX1
+		sta	edgeRight, x
+.jp05:
+		rts
+
+;edgeY0!=edgeY1
+.jp01:
+		jcc	.jpRightEdge
 
 ;calculation left edge
 ;calculation edge Y
 		sec
 		lda	<edgeY1
 		sbc	<edgeY0
-		beq	.edgeJump6L
-
 		sta	<edgeSlopeY
 		bcs	.edgeJump7L
 
@@ -4992,12 +4976,6 @@ calcEdge:
 		ldx	<edgeY1
 		sta	<edgeY1
 		stx	<edgeY0
-
-		jmp	.edgeJump7L
-
-.edgeJump6L:
-;edgeY0 = edgeY1
-		rts
 
 .edgeJump7L:
 ;calculation edge X
@@ -5233,14 +5211,12 @@ calcEdge:
 .edgeYLoop7L:
 		rts
 
-.jp00:
+.jpRightEdge:
 ;calculation right edge
 ;calculation edge Y
 		sec
 		lda	<edgeY1
 		sbc	<edgeY0
-		beq	.edgeJump6R
-
 		sta	<edgeSlopeY
 		bcs	.edgeJump7R
 
@@ -5258,12 +5234,6 @@ calcEdge:
 		ldx	<edgeY1
 		sta	<edgeY1
 		stx	<edgeY0
-
-		jmp	.edgeJump7R
-
-.edgeJump6R:
-;edgeY0 = edgeY1
-		rts
 
 .edgeJump7R:
 ;calculation edge X

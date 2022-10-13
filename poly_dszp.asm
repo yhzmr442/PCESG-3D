@@ -68,7 +68,6 @@ edgeY1			.ds	1
 edgeSlopeX		.ds	1
 edgeSlopeY		.ds	1
 edgeSigneX		.ds	1
-calcEdgeLastAddr	.ds	1
 polyLineColorDataWork	.ds	1
 polyLineX0		.ds	1
 polyLineX1		.ds	1
@@ -109,9 +108,7 @@ work4c			.ds	4
 work4d			.ds	4
 work8b			equ	work4c		;8Byte
 backCheckFlag		.ds	1
-yCheckWork		.ds	1
-yCheckFlag		.ds	1
-;			total 25 Byte
+;			total 23 Byte
 
 ;---------------------
 			.org	shareAreaTop
