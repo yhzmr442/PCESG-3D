@@ -4932,6 +4932,22 @@ calcEdge:
 		bne	.jp01
 
 ;edgeY0=edgeY1
+		ldx	<edgeY0
+		lda	<edgeX0
+		cmp	<edgeX1
+		bne	.jp04
+
+;edgeX0=edgeX1
+		ldy	<clip2D0Count
+		cpy	#1
+		beq	.jp05
+
+;edgeX0!=edgeX1
+.jp04:
+		sta	edgeLeft, x
+		lda	<edgeX1
+		sta	edgeRight, x
+.jp05:
 		rts
 
 ;edgeY0!=edgeY1
