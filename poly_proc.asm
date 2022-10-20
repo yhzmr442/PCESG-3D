@@ -4932,22 +4932,6 @@ calcEdge:
 		bne	.jp01
 
 ;edgeY0=edgeY1
-		ldx	<edgeY0
-		lda	<edgeX0
-		cmp	<edgeX1
-		bne	.jp04
-
-;edgeX0=edgeX1
-		ldy	<clip2D0Count
-		cpy	#1
-		beq	.jp05
-
-;edgeX0!=edgeX1
-.jp04:
-		sta	edgeLeft, x
-		lda	<edgeX1
-		sta	edgeRight, x
-.jp05:
 		rts
 
 ;edgeY0!=edgeY1
@@ -5565,15 +5549,28 @@ putPolyLineProcVdc1:
 
 ;left address
 		tax
-		lda	polyLineAddrConvXLow, x
-		ora	polyLineAddrConvYLow, y
-		sta	<polyLineLeftAddr
 
 		lda	polyLineAddrConvXHigh, x
 		ora	polyLineAddrConvYHigh, y
 		clc
 		adc	<polygonTopAddress
 		sta	<polyLineLeftAddr+1
+
+		lda	polyLineAddrConvXLow, x
+		ora	polyLineAddrConvYLow, y
+		sta	<polyLineLeftAddr
+
+;set left address
+		ldx	<polyLineLeftAddr+1
+		st0	#$00
+		sta	VDC1_2
+		stx	VDC1_3
+
+		st0	#$01
+		sta	VDC1_2
+		stx	VDC1_3
+
+		st0	#$02
 
 ;left put data
 		lda	edgeLeft, y
@@ -5594,10 +5591,75 @@ putPolyLineProcVdc1:
 		tax
 		sec
 		sbc	<polyLineCount
+		bne	.polyLineJump03
 
 ;count 0 then
-		jeq	.polyLineJump03
+;put line same address
+		lda	edgeRight, y
+		and	#$07
+		tax
+		lda	polyLineRightDatas, x
+		and	<polyLineLeftData
+		sta	<polyLineLeftData
+		eor	#$FF
+		sta	<polyLineLeftMask
 
+;VDC1
+;VDC1 left 0 1
+		lda	VDC1_2
+		and	<polyLineLeftMask
+		sta	<polyLineDataLow
+
+		lda	VDC1_3
+		and	<polyLineLeftMask
+		sta	<polyLineDataHigh
+
+		lda	<polyLineColorDataWork0
+		and	<polyLineLeftData
+		ora	<polyLineDataLow
+		sta	VDC1_2
+
+		lda	<polyLineColorDataWork1
+		and	<polyLineLeftData
+		ora	<polyLineDataHigh
+		sta	VDC1_3
+
+;VDC1 left 2 3
+		lda	<polyLineLeftAddr
+		ora	#$08
+		ldx	<polyLineLeftAddr+1
+		st0	#$00
+		sta	VDC1_2
+		stx	VDC1_3
+
+		st0	#$01
+		sta	VDC1_2
+		stx	VDC1_3
+
+		st0	#$02
+
+		lda	VDC1_2
+		and	<polyLineLeftMask
+		sta	<polyLineDataLow
+
+		lda	VDC1_3
+		and	<polyLineLeftMask
+		sta	<polyLineDataHigh
+
+		lda	<polyLineColorDataWork2
+		and	<polyLineLeftData
+		ora	<polyLineDataLow
+		sta	VDC1_2
+
+		lda	<polyLineColorDataWork3
+		and	<polyLineLeftData
+		ora	<polyLineDataHigh
+		sta	VDC1_3
+
+;loop jump
+		jmp	.loop0
+
+.polyLineJump03:
 		sta	<polyLineCount
 
 ;right address
@@ -5631,18 +5693,6 @@ putPolyLineProcVdc1:
 		phy
 
 ;VDC1 left 0 1
-		lda	<polyLineLeftAddr
-		ldy	<polyLineLeftAddr+1
-		st0	#$00
-		sta	VDC1_2
-		sty	VDC1_3
-
-		st0	#$01
-		sta	VDC1_2
-		sty	VDC1_3
-
-		st0	#$02
-
 		lda	VDC1_2
 		and	<polyLineLeftMask
 		sta	<polyLineDataLow
@@ -5770,84 +5820,6 @@ putPolyLineProcVdc1:
 ;loop jump
 		jmp	.loop0
 
-;put line same address
-.polyLineJump03:
-		lda	edgeRight, y
-		and	#$07
-		tax
-		lda	polyLineRightDatas, x
-		and	<polyLineLeftData
-		sta	<polyLineLeftData
-		eor	#$FF
-		sta	<polyLineLeftMask
-
-;VDC1
-;VDC1 left 0 1
-		lda	<polyLineLeftAddr
-		ldx	<polyLineLeftAddr+1
-		st0	#$00
-		sta	VDC1_2
-		stx	VDC1_3
-
-		st0	#$01
-		sta	VDC1_2
-		stx	VDC1_3
-
-		st0	#$02
-
-		lda	VDC1_2
-		and	<polyLineLeftMask
-		sta	<polyLineDataLow
-
-		lda	VDC1_3
-		and	<polyLineLeftMask
-		sta	<polyLineDataHigh
-
-		lda	<polyLineColorDataWork0
-		and	<polyLineLeftData
-		ora	<polyLineDataLow
-		sta	VDC1_2
-
-		lda	<polyLineColorDataWork1
-		and	<polyLineLeftData
-		ora	<polyLineDataHigh
-		sta	VDC1_3
-
-;VDC1 left 2 3
-		lda	<polyLineLeftAddr
-		ora	#$08
-		ldx	<polyLineLeftAddr+1
-		st0	#$00
-		sta	VDC1_2
-		stx	VDC1_3
-
-		st0	#$01
-		sta	VDC1_2
-		stx	VDC1_3
-
-		st0	#$02
-
-		lda	VDC1_2
-		and	<polyLineLeftMask
-		sta	<polyLineDataLow
-
-		lda	VDC1_3
-		and	<polyLineLeftMask
-		sta	<polyLineDataHigh
-
-		lda	<polyLineColorDataWork2
-		and	<polyLineLeftData
-		ora	<polyLineDataLow
-		sta	VDC1_2
-
-		lda	<polyLineColorDataWork3
-		and	<polyLineLeftData
-		ora	<polyLineDataHigh
-		sta	VDC1_3
-
-;loop jump
-		jmp	.loop0
-
 ;--------
 .centerVDC1_01Addr:
 		dw	.centerVDC1_01 +6*30	;-1
@@ -5971,15 +5943,28 @@ putPolyLineProcVdc2:
 
 ;left address
 		tax
-		lda	polyLineAddrConvXLow, x
-		ora	polyLineAddrConvYLow, y
-		sta	<polyLineLeftAddr
 
 		lda	polyLineAddrConvXHigh, x
 		ora	polyLineAddrConvYHigh, y
 		clc
 		adc	<polygonTopAddress
 		sta	<polyLineLeftAddr+1
+
+		lda	polyLineAddrConvXLow, x
+		ora	polyLineAddrConvYLow, y
+		sta	<polyLineLeftAddr
+
+;set left address
+		ldx	<polyLineLeftAddr+1
+		st0	#$00
+		sta	VDC2_2
+		stx	VDC2_3
+
+		st0	#$01
+		sta	VDC2_2
+		stx	VDC2_3
+
+		st0	#$02
 
 ;left put data
 		lda	edgeLeft, y
@@ -6000,10 +5985,75 @@ putPolyLineProcVdc2:
 		tax
 		sec
 		sbc	<polyLineCount
+		bne	.polyLineJump03
 
 ;count 0 then
-		jeq	.polyLineJump03
+;put line same address
+		lda	edgeRight, y
+		and	#$07
+		tax
+		lda	polyLineRightDatas, x
+		and	<polyLineLeftData
+		sta	<polyLineLeftData
+		eor	#$FF
+		sta	<polyLineLeftMask
 
+;VDC2
+;VDC2 left 0 1
+		lda	VDC2_2
+		and	<polyLineLeftMask
+		sta	<polyLineDataLow
+
+		lda	VDC2_3
+		and	<polyLineLeftMask
+		sta	<polyLineDataHigh
+
+		lda	<polyLineColorDataWork0
+		and	<polyLineLeftData
+		ora	<polyLineDataLow
+		sta	VDC2_2
+
+		lda	<polyLineColorDataWork1
+		and	<polyLineLeftData
+		ora	<polyLineDataHigh
+		sta	VDC2_3
+
+;VDC2 left 2 3
+		lda	<polyLineLeftAddr
+		ora	#$08
+		ldx	<polyLineLeftAddr+1
+		st0	#$00
+		sta	VDC2_2
+		stx	VDC2_3
+
+		st0	#$01
+		sta	VDC2_2
+		stx	VDC2_3
+
+		st0	#$02
+
+		lda	VDC2_2
+		and	<polyLineLeftMask
+		sta	<polyLineDataLow
+
+		lda	VDC2_3
+		and	<polyLineLeftMask
+		sta	<polyLineDataHigh
+
+		lda	<polyLineColorDataWork2
+		and	<polyLineLeftData
+		ora	<polyLineDataLow
+		sta	VDC2_2
+
+		lda	<polyLineColorDataWork3
+		and	<polyLineLeftData
+		ora	<polyLineDataHigh
+		sta	VDC2_3
+
+;loop jump
+		jmp	.loop0
+
+.polyLineJump03:
 		sta	<polyLineCount
 
 ;right address
@@ -6029,6 +6079,7 @@ putPolyLineProcVdc2:
 
 ;put line
 ;VDC2
+;center jump index
 		lda	<polyLineCount
 		asl	a
 		tax
@@ -6036,18 +6087,6 @@ putPolyLineProcVdc2:
 		phy
 
 ;VDC2 left 0 1
-		lda	<polyLineLeftAddr
-		ldy	<polyLineLeftAddr+1
-		st0	#$00
-		sta	VDC2_2
-		sty	VDC2_3
-
-		st0	#$01
-		sta	VDC2_2
-		sty	VDC2_3
-
-		st0	#$02
-
 		lda	VDC2_2
 		and	<polyLineLeftMask
 		sta	<polyLineDataLow
@@ -6170,84 +6209,6 @@ putPolyLineProcVdc2:
 		sta	VDC2_3
 
 		ply
-
-;loop jump
-		jmp	.loop0
-
-;put line same address
-.polyLineJump03:
-		lda	edgeRight, y
-		and	#$07
-		tax
-		lda	polyLineRightDatas, x
-		and	<polyLineLeftData
-		sta	<polyLineLeftData
-		eor	#$FF
-		sta	<polyLineLeftMask
-
-;VDC2
-;VDC2 left 0 1
-		lda	<polyLineLeftAddr
-		ldx	<polyLineLeftAddr+1
-		st0	#$00
-		sta	VDC2_2
-		stx	VDC2_3
-
-		st0	#$01
-		sta	VDC2_2
-		stx	VDC2_3
-
-		st0	#$02
-
-		lda	VDC2_2
-		and	<polyLineLeftMask
-		sta	<polyLineDataLow
-
-		lda	VDC2_3
-		and	<polyLineLeftMask
-		sta	<polyLineDataHigh
-
-		lda	<polyLineColorDataWork0
-		and	<polyLineLeftData
-		ora	<polyLineDataLow
-		sta	VDC2_2
-
-		lda	<polyLineColorDataWork1
-		and	<polyLineLeftData
-		ora	<polyLineDataHigh
-		sta	VDC2_3
-
-;VDC2 left 2 3
-		lda	<polyLineLeftAddr
-		ora	#$08
-		ldx	<polyLineLeftAddr+1
-		st0	#$00
-		sta	VDC2_2
-		stx	VDC2_3
-
-		st0	#$01
-		sta	VDC2_2
-		stx	VDC2_3
-
-		st0	#$02
-
-		lda	VDC2_2
-		and	<polyLineLeftMask
-		sta	<polyLineDataLow
-
-		lda	VDC2_3
-		and	<polyLineLeftMask
-		sta	<polyLineDataHigh
-
-		lda	<polyLineColorDataWork2
-		and	<polyLineLeftData
-		ora	<polyLineDataLow
-		sta	VDC2_2
-
-		lda	<polyLineColorDataWork3
-		and	<polyLineLeftData
-		ora	<polyLineDataHigh
-		sta	VDC2_3
 
 ;loop jump
 		jmp	.loop0
