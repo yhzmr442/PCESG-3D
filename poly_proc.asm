@@ -1859,7 +1859,7 @@ putPolygonBuffer:
 
 		ldy	#5
 		lda	[polyBufferAddr], y	;COUNT
-		beq	.putPolyBufferEnd
+		jeq	.putPolyBufferEnd
 
 		sta	<polyAttribute
 		bpl	.polygonProc
@@ -1894,39 +1894,71 @@ putPolygonBuffer:
 
 .polygonProc:
 		and	#$0F
+		dec	a
 		sta	<clip2D0Count
 
-		pha
+		ldy	#7
+		lda	[polyBufferAddr], y
+		sta	<minEdgeY
+		sta	<maxEdgeY
 
-		clx
-		ldy	#6
+		dey
 
 .putPolyBufferLoop1:
 		lda	[polyBufferAddr], y
-		sta	clip2D0, x
-		inx
-		inx
+		sta	<edgeX0
+		iny
+		lda	[polyBufferAddr], y
+		sta	<edgeY0
 		iny
 
+		phy
+
 		lda	[polyBufferAddr], y
-		sta	clip2D0, x
-		inx
-		inx
+		sta	<edgeX1
 		iny
+		lda	[polyBufferAddr], y
+		sta	<edgeY1
+		iny
+
+		cmp	<minEdgeY
+		bcs	.jp0
+		sta	<minEdgeY
+
+.jp0:
+		cmp	<maxEdgeY
+		bcc	.jp1
+		sta	<maxEdgeY
+
+.jp1:
+		jsr	calcEdge
+
+		ply
 
 		dec	<clip2D0Count
 		bne	.putPolyBufferLoop1
 
-		pla
+		lda	[polyBufferAddr], y
+		sta	<edgeX0
+		iny
+		lda	[polyBufferAddr], y
+		sta	<edgeY0
 
-		sta	<clip2D0Count
-		jsr	calcEdge_putPoly
+		ldy	#6
+		lda	[polyBufferAddr], y
+		sta	<edgeX1
+		iny
+		lda	[polyBufferAddr], y
+		sta	<edgeY1
+
+		jsr	calcEdge
+
+		jsr	putPolyLine
 
 .nextData:
-		cly
-		lda	[polyBufferAddr], y
+		lda	[polyBufferAddr]
 		tax
-		iny
+		ldy	#1
 		lda	[polyBufferAddr], y
 		sta	<polyBufferAddr+1
 		stx	<polyBufferAddr+0
@@ -4624,61 +4656,6 @@ atanDataLow:
 ;////////////////////////////
 		.bank	2
 		.org	$4000
-
-;----------------------------
-calcEdge_putPoly:
-;
-		lda	<clip2D0Count
-		asl	a
-		asl	a
-		tax
-		lda	clip2D0
-		sta	clip2D0, x
-		lda	clip2D0+2
-		sta	clip2D0+2, x
-
-		mov	<minEdgeY, #$FF
-		stz	<maxEdgeY
-
-		clx
-
-.calcEdge_putPolyLoop0:
-		lda	clip2D0, x
-		sta	<edgeX0
-		lda	clip2D0+2, x
-		sta	<edgeY0
-
-		cmp	<minEdgeY
-		bcs	.calcEdge_putPolyJump2
-		sta	<minEdgeY
-
-.calcEdge_putPolyJump2:
-		cmp	<maxEdgeY
-		bcc	.calcEdge_putPolyJump6
-		sta	<maxEdgeY
-
-.calcEdge_putPolyJump6:
-		lda	clip2D0+4, x
-		sta	<edgeX1
-		lda	clip2D0+6, x
-		sta	<edgeY1
-
-		phx
-		jsr	calcEdge
-		plx
-
-		inx
-		inx
-		inx
-		inx
-
-		dec	<clip2D0Count
-		bne	.calcEdge_putPolyLoop0
-
-		jsr	putPolyLine
-
-		rts
-
 
 ;----------------------------
 calcCircle_putPoly:
