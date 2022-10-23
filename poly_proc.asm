@@ -457,6 +457,9 @@ initializePsg:
 
 ;----------------------------
 initializeDda:
+;
+		stz	<dda0No
+
 ;use channel No3
 		mov	PSG_0, #$03
 		mov	PSG_4, #$DF
@@ -483,7 +486,8 @@ stopDda:
 ;----------------------------
 setDda:
 ;
-		bbr7	<dda0Flag, .jp00
+		tst	#$FF, <dda0No
+		beq	.jp00
 
 		ora	#$00
 		bmi	.jp01
@@ -500,11 +504,15 @@ setDda:
 
 .jp00:
 		and	#$7F
+
 .jp02:
 		sei
+
 		sta	<dda0No
 		movw	<dda0Address, #$4000
-		smb7	<dda0Flag
+
+		jsr	startDda
+
 		cli
 
 .funcEnd:
@@ -515,8 +523,6 @@ setDda:
 timerPlayDdaFunction:
 ;
 		phx
-
-		bbr7	<dda0Flag, .funcEnd
 
 ;set dda data bank
 		tma	#$02
@@ -529,8 +535,10 @@ timerPlayDdaFunction:
 		lda	[dda0Address]
 		bpl	.jp00
 
-		rmb7	<dda0Flag
+		stz	<dda0No
 		and	#$1F
+
+		jsr	stopDda
 
 .jp00:
 		ldx	#$03
@@ -543,7 +551,6 @@ timerPlayDdaFunction:
 		pla
 		tam	#$02
 
-.funcEnd:
 		plx
 		rts
 
@@ -1902,6 +1909,9 @@ putPolygonBuffer:
 		sta	<minEdgeY
 		sta	<maxEdgeY
 
+		sta	<yCheckWork
+		clx
+
 		dey
 
 .putPolyBufferLoop1:
@@ -1931,12 +1941,25 @@ putPolygonBuffer:
 		sta	<maxEdgeY
 
 .jp1:
+
+		cmp	<yCheckWork
+		beq	.jp2
+		ldx	#1
+
+.jp2:
+		phx
+
 		jsr	calcEdge
+
+		plx
 
 		ply
 
 		dec	<clip2D0Count
 		bne	.putPolyBufferLoop1
+
+		cpx	#0
+		beq	.nextData
 
 		lda	[polyBufferAddr], y
 		sta	<edgeX0
@@ -4909,22 +4932,6 @@ calcEdge:
 		bne	.jp01
 
 ;edgeY0=edgeY1
-		ldx	<edgeY0
-		lda	<edgeX0
-		cmp	<edgeX1
-		bne	.jp04
-
-;edgeX0=edgeX1
-		ldy	<clip2D0Count
-		cpy	#1
-		beq	.jp05
-
-;edgeX0!=edgeX1
-.jp04:
-		sta	edgeLeft, x
-		lda	<edgeX1
-		sta	edgeRight, x
-.jp05:
 		rts
 
 ;edgeY0!=edgeY1

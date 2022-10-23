@@ -108,7 +108,8 @@ work4c			.ds	4
 work4d			.ds	4
 work8b			equ	work4c		;8Byte
 backCheckFlag		.ds	1
-;			total 23 Byte
+yCheckWork		.ds	1
+;			total 24 Byte
 
 ;---------------------
 			.org	shareAreaTop
@@ -232,6 +233,5 @@ model2DClipIndexWork	.ds	1
 satBufferAddr		.ds	2
 
 ;---------------------
-dda0Flag		.ds	1
 dda0No			.ds	1
 dda0Address		.ds	2
