@@ -1909,7 +1909,6 @@ putPolygonBuffer:
 		sta	<minEdgeY
 		sta	<maxEdgeY
 
-		sta	<yCheckWork
 		clx
 
 		dey
@@ -1941,18 +1940,17 @@ putPolygonBuffer:
 		sta	<maxEdgeY
 
 .jp1:
-
-		cmp	<yCheckWork
+		cmp	<edgeY0
 		beq	.jp2
 		ldx	#1
 
-.jp2:
 		phx
 
 		jsr	calcEdge
 
 		plx
 
+.jp2:
 		ply
 
 		dec	<clip2D0Count
@@ -1974,8 +1972,12 @@ putPolygonBuffer:
 		lda	[polyBufferAddr], y
 		sta	<edgeY1
 
+		cmp	<edgeY0
+		beq	.jp3
+
 		jsr	calcEdge
 
+.jp3:
 		jsr	putPolyLine
 
 .nextData:
@@ -4929,13 +4931,6 @@ calcEdge:
 ;
 		lda	<edgeY1
 		cmp	<edgeY0
-		bne	.jp01
-
-;edgeY0=edgeY1
-		rts
-
-;edgeY0!=edgeY1
-.jp01:
 		jcc	.jpRightEdge
 
 ;calculation left edge
