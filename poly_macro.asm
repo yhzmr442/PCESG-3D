@@ -173,6 +173,26 @@ movwzpx		.macro
 
 
 ;----------------------------
+adc2		.macro
+;\1 = \2 + \3
+;\1 = \1 + \2
+		.if	(\# = 1)
+			adc	\1
+		.else
+			.if	(\# = 3)
+				lda	\2
+				adc	\3
+				sta	\1
+			.else
+				lda	\1
+				adc	\2
+				sta	\1
+			.endif
+		.endif
+		.endm
+
+
+;----------------------------
 add		.macro
 ;\1 = \2 + \3
 ;\1 = \1 + \2
@@ -398,6 +418,26 @@ addq		.macro
 			lda	\1+3
 			adc	\2+3
 			sta	\1+3
+		.endif
+		.endm
+
+
+;----------------------------
+sbc2		.macro
+;\1 = \2 - \3
+;\1 = \1 - \2
+		.if	(\# = 1)
+			sbc	\1
+		.else
+			.if	(\# = 3)
+				lda	\2
+				sbc	\3
+				sta	\1
+			.else
+				lda	\1
+				sbc	\2
+				sta	\1
+			.endif
 		.endif
 		.endm
 

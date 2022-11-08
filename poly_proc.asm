@@ -70,7 +70,12 @@
 ;$C000-$DFFF	polygon function
 ;$E000-$FFFF	main
 
-;----------------------------
+;RAM
+;1F0000-1F1FFF	ZERO PAGE
+;1F2000-1F3FFF
+;1F4000-1F5FFF
+;1F6000-1F7FFF
+
 ;VRAM
 ;$0000-$03FF	BAT
 ;$0400-$04FF	SAT
@@ -4821,10 +4826,55 @@ calcCircle_putPoly:
 
 .jp21:
 		addw	<circleYWork, <circleCenterY, <circleY
-		jsr	setCircleEdge0
+		bne	.jp102
 
+		ldy	<circleYWork
+		cpy	#192
+		bcs	.jp102
+
+		cpy	<minEdgeY
+		bcs	.jp100
+
+		sty	<minEdgeY
+
+.jp100:
+		cpy	<maxEdgeY
+		bcc	.jp101
+
+		sty	<maxEdgeY
+
+.jp101:
+		lda	<circleXLeftWork
+		sta	edgeLeft, y
+
+		lda	<circleXRightWork
+		sta	edgeRight, y
+
+.jp102:
 		subw	<circleYWork, <circleCenterY, <circleY
-		jsr	setCircleEdge0
+		bne	.jp04
+
+		ldy	<circleYWork
+		cpy	#192
+		bcs	.jp04
+
+		cpy	<minEdgeY
+		bcs	.jp200
+
+		sty	<minEdgeY
+
+.jp200:
+		cpy	<maxEdgeY
+		bcc	.jp201
+
+		sty	<maxEdgeY
+
+.jp201:
+		lda	<circleXLeftWork
+		sta	edgeLeft, y
+
+		lda	<circleXRightWork
+		sta	edgeRight, y
 
 .jp04:
 		lda	<circleXLeft1
@@ -4848,10 +4898,55 @@ calcCircle_putPoly:
 
 .jp23:
 		addw	<circleYWork, <circleCenterY, <circleX
-		jsr	setCircleEdge1
+		bne	.jp302
 
+		ldy	<circleYWork
+		cpy	#192
+		bcs	.jp302
+
+		cpy	<minEdgeY
+		bcs	.jp300
+
+		sty	<minEdgeY
+
+.jp300:
+		cpy	<maxEdgeY
+		bcc	.jp301
+
+		sty	<maxEdgeY
+
+.jp301:
+		lda	<circleXLeftWork
+		sta	edgeLeft, y
+
+		lda	<circleXRightWork
+		sta	edgeRight, y
+
+.jp302:
 		subw	<circleYWork, <circleCenterY, <circleX
-		jsr	setCircleEdge1
+		bne	.jp05
+
+		ldy	<circleYWork
+		cpy	#192
+		bcs	.jp05
+
+		cpy	<minEdgeY
+		bcs	.jp400
+
+		sty	<minEdgeY
+
+.jp400:
+		cpy	<maxEdgeY
+		bcc	.jp401
+
+		sty	<maxEdgeY
+
+.jp401:
+		lda	<circleXLeftWork
+		sta	edgeLeft, y
+
+		lda	<circleXRightWork
+		sta	edgeRight, y
 
 .jp05:
 		incw	<circleY
@@ -4860,70 +4955,6 @@ calcCircle_putPoly:
 		decw	<circleXLeft1
 
 		jmp	.loop0
-
-
-;----------------------------
-setCircleEdge0:
-;
-		lda	<circleYWork+1
-		bne	.endSet
-
-		ldy	<circleYWork
-		cpy	#192
-		bcs	.endSet
-
-		cpy	<minEdgeY
-		bcs	.jp02
-
-		sty	<minEdgeY
-
-.jp02:
-		cpy	<maxEdgeY
-		bcc	.jp03
-
-		sty	<maxEdgeY
-
-.jp03:
-		lda	<circleXLeftWork
-		sta	edgeLeft, y
-
-		lda	<circleXRightWork
-		sta	edgeRight, y
-
-.endSet:
-		rts
-
-
-;----------------------------
-setCircleEdge1:
-;
-		lda	<circleYWork+1
-		bne	.endSet
-
-		ldy	<circleYWork
-		cpy	#192
-		bcs	.endSet
-
-		cpy	<minEdgeY
-		bcs	.jp02
-
-		sty	<minEdgeY
-
-.jp02:
-		cpy	<maxEdgeY
-		bcc	.jp03
-
-		sty	<maxEdgeY
-
-.jp03:
-		lda	<circleXLeftWork
-		sta	edgeLeft, y
-
-		lda	<circleXRightWork
-		sta	edgeRight, y
-
-.endSet:
-		rts
 
 
 ;----------------------------
@@ -4982,20 +5013,20 @@ calcEdge:
 		lsr	a
 
 		lda	<edgeX0
-		ldx	<edgeY0
+		ldy	<edgeY0
 
 		bcc	.edgeLoop0_1L
 
 .edgeLoop0_0L:
-		sta	edgeLeft, x
-		inx
+		sta	edgeLeft, y
+		iny
 
 .edgeLoop0_1L:
-		sta	edgeLeft, x
+		sta	edgeLeft, y
 
-		cpx	<edgeY1
+		cpy	<edgeY1
 		beq	.edgeJump9L
-		inx
+		iny
 		bra	.edgeLoop0_0L
 
 .edgeJump9L:
@@ -5021,39 +5052,39 @@ calcEdge:
 		eor	#$FF
 		inc	a
 
-		ldy	<edgeX0
-		ldx	<edgeY0
+		ldx	<edgeX0
+		ldy	<edgeY0
 
 		bcc	.edgeXLoop0_1L
 
 .edgeXLoop0_0L:
-		say
-		sta	edgeLeft, x
-		say
+		sax
+		sta	edgeLeft, y
+		sax
 
 .edgeXLoop1_0L:
-		iny
+		inx
 		adc	<edgeSlopeY
 		bcc	.edgeXLoop1_1L
 
 		sbc	<edgeSlopeX
-		inx
+		iny
 
 .edgeXLoop0_1L:
-		say
-		sta	edgeLeft, x
-		say
+		sax
+		sta	edgeLeft, y
+		sax
 
 .edgeXLoop1_1L:
-		cpy	<edgeX1
+		cpx	<edgeX1
 		beq	.edgeXLoop3L
 
-		iny
+		inx
 		adc	<edgeSlopeY
 		bcc	.edgeXLoop1_0L
 
 		sbc	<edgeSlopeX
-		inx
+		iny
 		bra	.edgeXLoop0_0L
 .edgeXLoop3L:
 		rts
@@ -5069,39 +5100,39 @@ calcEdge:
 		eor	#$FF
 		inc	a
 
-		ldy	<edgeX1
-		ldx	<edgeY1
+		ldx	<edgeX1
+		ldy	<edgeY1
 
 		bcc	.edgeXLoop4_1L
 
 .edgeXLoop4_0L:
-		say
-		sta	edgeLeft, x
-		say
+		sax
+		sta	edgeLeft, y
+		sax
 
 .edgeXLoop5_0L:
-		iny
+		inx
 		adc	<edgeSlopeY
 		bcc	.edgeXLoop5_1L
 
 		sbc	<edgeSlopeX
-		dex
+		dey
 
 .edgeXLoop4_1L:
-		say
-		sta	edgeLeft, x
-		say
+		sax
+		sta	edgeLeft, y
+		sax
 
 .edgeXLoop5_1L:
-		cpy	<edgeX0
+		cpx	<edgeX0
 		beq	.edgeXLoop7L
 
-		iny
+		inx
 		adc	<edgeSlopeY
 		bcc	.edgeXLoop5_0L
 
 		sbc	<edgeSlopeX
-		dex
+		dey
 		bra	.edgeXLoop4_0L
 .edgeXLoop7L:
 		rts
@@ -5117,8 +5148,8 @@ calcEdge:
 		eor	#$FF
 		inc	a
 
-		ldy	<edgeX0
-		ldx	<edgeY0
+		ldx	<edgeX0
+		ldy	<edgeY0
 
 ;check edgeSigneX
 		bbs7	<edgeSigneX, .edgeYLoop8L
@@ -5127,31 +5158,31 @@ calcEdge:
 		bcc	.edgeYLoop0_1L
 
 .edgeYLoop0_0L:
-		say
-		sta	edgeLeft, x
-		say
+		sax
+		sta	edgeLeft, y
+		sax
 
-		inx
+		iny
 		adc	<edgeSlopeX
 		bcc	.edgeYLoop0_1L
 
 		sbc	<edgeSlopeY
-		iny
+		inx
 
 .edgeYLoop0_1L:
-		say
-		sta	edgeLeft, x
-		say
+		sax
+		sta	edgeLeft, y
+		sax
 
-		cpx	<edgeY1
+		cpy	<edgeY1
 		beq	.edgeYLoop3L
 
-		inx
+		iny
 		adc	<edgeSlopeX
 		bcc	.edgeYLoop0_0L
 
 		sbc	<edgeSlopeY
-		iny
+		inx
 		bra	.edgeYLoop0_0L
 .edgeYLoop3L:
 		rts
@@ -5161,31 +5192,31 @@ calcEdge:
 		bcc	.edgeYLoop4_1L
 
 .edgeYLoop4_0L:
-		say
-		sta	edgeLeft, x
-		say
+		sax
+		sta	edgeLeft, y
+		sax
 
-		inx
+		iny
 		adc	<edgeSlopeX
 		bcc	.edgeYLoop4_1L
 
 		sbc	<edgeSlopeY
-		dey
+		dex
 
 .edgeYLoop4_1L:
-		say
-		sta	edgeLeft, x
-		say
+		sax
+		sta	edgeLeft, y
+		sax
 
-		cpx	<edgeY1
+		cpy	<edgeY1
 		beq	.edgeYLoop7L
 
-		inx
+		iny
 		adc	<edgeSlopeX
 		bcc	.edgeYLoop4_0L
 
 		sbc	<edgeSlopeY
-		dey
+		dex
 		bra	.edgeYLoop4_0L
 .edgeYLoop7L:
 		rts
@@ -5240,20 +5271,20 @@ calcEdge:
 		lsr	a
 
 		lda	<edgeX0
-		ldx	<edgeY0
+		ldy	<edgeY0
 
 		bcc	.edgeLoop0_1R
 
 .edgeLoop0_0R:
-		sta	edgeRight, x
-		inx
+		sta	edgeRight, y
+		iny
 
 .edgeLoop0_1R:
-		sta	edgeRight, x
+		sta	edgeRight, y
 
-		cpx	<edgeY1
+		cpy	<edgeY1
 		beq	.edgeJump9R
-		inx
+		iny
 		bra	.edgeLoop0_0R
 
 .edgeJump9R:
@@ -5278,39 +5309,39 @@ calcEdge:
 		eor	#$FF
 		inc	a
 
-		ldy	<edgeX0
-		ldx	<edgeY0
+		ldx	<edgeX0
+		ldy	<edgeY0
 
 		bcc	.edgeXLoop0_1R
 
 .edgeXLoop0_0R:
-		say
-		sta	edgeRight, x
-		say
+		sax
+		sta	edgeRight, y
+		sax
 
 .edgeXLoop1_0R:
-		iny
+		inx
 		adc	<edgeSlopeY
 		bcc	.edgeXLoop1_1R
 
 		sbc	<edgeSlopeX
-		inx
+		iny
 
 .edgeXLoop0_1R:
-		say
-		sta	edgeRight, x
-		say
+		sax
+		sta	edgeRight, y
+		sax
 
 .edgeXLoop1_1R:
-		cpy	<edgeX1
+		cpx	<edgeX1
 		beq	.edgeXLoop3R
 
-		iny
+		inx
 		adc	<edgeSlopeY
 		bcc	.edgeXLoop1_0R
 
 		sbc	<edgeSlopeX
-		inx
+		iny
 		bra	.edgeXLoop0_0R
 .edgeXLoop3R:
 		rts
@@ -5326,39 +5357,39 @@ calcEdge:
 		eor	#$FF
 		inc	a
 
-		ldy	<edgeX1
-		ldx	<edgeY1
+		ldx	<edgeX1
+		ldy	<edgeY1
 
 		bcc	.edgeXLoop4_1R
 
 .edgeXLoop4_0R:
-		say
-		sta	edgeRight, x
-		say
+		sax
+		sta	edgeRight, y
+		sax
 
 .edgeXLoop5_0R:
-		iny
+		inx
 		adc	<edgeSlopeY
 		bcc	.edgeXLoop5_1R
 
 		sbc	<edgeSlopeX
-		dex
+		dey
 
 .edgeXLoop4_1R:
-		say
-		sta	edgeRight, x
-		say
+		sax
+		sta	edgeRight, y
+		sax
 
 .edgeXLoop5_1R:
-		cpy	<edgeX0
+		cpx	<edgeX0
 		beq	.edgeXLoop7R
 
-		iny
+		inx
 		adc	<edgeSlopeY
 		bcc	.edgeXLoop5_0R
 
 		sbc	<edgeSlopeX
-		dex
+		dey
 		bra	.edgeXLoop4_0R
 .edgeXLoop7R:
 		rts
@@ -5374,8 +5405,8 @@ calcEdge:
 		eor	#$FF
 		inc	a
 
-		ldy	<edgeX0
-		ldx	<edgeY0
+		ldx	<edgeX0
+		ldy	<edgeY0
 
 ;check edgeSigneX
 		bbs7	<edgeSigneX, .edgeYLoop8R
@@ -5384,31 +5415,31 @@ calcEdge:
 		bcc	.edgeYLoop0_1R
 
 .edgeYLoop0_0R:
-		say
-		sta	edgeRight, x
-		say
+		sax
+		sta	edgeRight, y
+		sax
 
-		inx
+		iny
 		adc	<edgeSlopeX
 		bcc	.edgeYLoop0_1R
 
 		sbc	<edgeSlopeY
-		iny
+		inx
 
 .edgeYLoop0_1R:
-		say
-		sta	edgeRight, x
-		say
+		sax
+		sta	edgeRight, y
+		sax
 
-		cpx	<edgeY1
+		cpy	<edgeY1
 		beq	.edgeYLoop3R
 
-		inx
+		iny
 		adc	<edgeSlopeX
 		bcc	.edgeYLoop0_0R
 
 		sbc	<edgeSlopeY
-		iny
+		inx
 		bra	.edgeYLoop0_0R
 .edgeYLoop3R:
 		rts
@@ -5418,31 +5449,31 @@ calcEdge:
 		bcc	.edgeYLoop4_1R
 
 .edgeYLoop4_0R:
-		say
-		sta	edgeRight, x
-		say
+		sax
+		sta	edgeRight, y
+		sax
 
-		inx
+		iny
 		adc	<edgeSlopeX
 		bcc	.edgeYLoop4_1R
 
 		sbc	<edgeSlopeY
-		dey
+		dex
 
 .edgeYLoop4_1R:
-		say
-		sta	edgeRight, x
-		say
+		sax
+		sta	edgeRight, y
+		sax
 
-		cpx	<edgeY1
+		cpy	<edgeY1
 		beq	.edgeYLoop7R
 
-		inx
+		iny
 		adc	<edgeSlopeX
 		bcc	.edgeYLoop4_0R
 
 		sbc	<edgeSlopeY
-		dey
+		dex
 		bra	.edgeYLoop4_0R
 .edgeYLoop7R:
 		rts
@@ -5567,7 +5598,7 @@ putPolyLineProcVdc1:
 
 		st0	#$02
 
-;left put data
+;put left data
 		lda	edgeLeft, y
 		and	#$07
 		tax
@@ -5668,7 +5699,7 @@ putPolyLineProcVdc1:
 		adc	<polygonTopAddress
 		sta	<polyLineRightAddr+1
 
-;right put data
+;put right data
 		lda	edgeRight, y
 		and	#$07
 		tax
@@ -5961,7 +5992,7 @@ putPolyLineProcVdc2:
 
 		st0	#$02
 
-;left put data
+;put left data
 		lda	edgeLeft, y
 		and	#$07
 		tax
@@ -6062,7 +6093,7 @@ putPolyLineProcVdc2:
 		adc	<polygonTopAddress
 		sta	<polyLineRightAddr+1
 
-;right put data
+;put right data
 		lda	edgeRight, y
 		and	#$07
 		tax
